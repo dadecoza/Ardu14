@@ -22,7 +22,11 @@ Ardu14 can accept Intel Hex files uploaded over the serial port at 9600 baud.
 ### Limitations / TODO
 * SIO instructions have not been implemented yet. It would be cool to enable writing to the Arduino's serial port using the SIO instructions.
 * Using the inexpensive 16x2 LCD might not have been the best choice, as it does not handle rapidly changing characters very well. For instance, the scrolling text of the "SC message" program or the flying ducks in "Duck Shoot". Turning the potentiometer to lower the contrast does help make it a bit more acceptable.
+
+***EDIT:*** It have been pointed out by Retro Phil on the [Science of Cambridge MK14 Microcomputer & NatSemi SC/MP](https://www.facebook.com/groups/1330313924562216) facebook group, that using the OLED version of this display should resolve the issue.
+
 <img src="https://raw.githubusercontent.com/dadecoza/Ardu14/main/Images/LowContrast.gif" alt="Low Contrast" width="300" height="auto">
+
 Example of scrolling text with low contrast.
 
 ### PIC14

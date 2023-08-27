@@ -79,8 +79,6 @@ byte rowPins[ROWS] = {10, A0, A1, A2, A3}; // connect to the row pinouts of the 
 byte colPins[COLS] = {6, 7, 8, 9};         // connect to the column pinouts of the keypad
 Keypad keypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
-int debug = 0;
-
 /********************************************************************/
 /*              Setup hardware and initialze CPU                    */
 /********************************************************************/
@@ -722,7 +720,7 @@ int ReadKeyboard(int a)
 
 void hexLoader(int b)
 {
-  if ((b == '\n' || b == '\r'))
+  if ((b == '\n') || (b == '\r'))
     return;
   if ((b >= 97) && (b <= 122))
     b = b - 32;
