@@ -24,8 +24,78 @@
 /********************************************************************/
 #include "scmp.h"
 #include "scios.h"
-#include <LiquidCrystal.h>
 #include <Keypad.h>
+
+/********************************************************************/
+/* Select connected display type                                    */
+/********************************************************************/
+
+//#define LCD1602
+#define MAX7219
+
+/********************************************************************/
+/* Configure 16x2 LCD display                                       */
+/********************************************************************/
+
+#ifdef LCD1602
+#include <LiquidCrystal.h>
+#define RS_PIN 12
+#define EN_PIN 11
+#define D4_PIN 5
+#define D5_PIN 4
+#define D6_PIN 3
+#define D7_PIN 2
+LiquidCrystal lcd(RS_PIN, EN_PIN, D4_PIN, D5_PIN, D6_PIN, D7_PIN);
+#endif
+
+/********************************************************************/
+/* Configure MAX7219 8x 7 segment display                           */
+/*                                                                  */
+/* MODULE.....UNO/NANO.....MEGA                                     */
+/* VCC........+5V..........+5V                                      */
+/* GND........GND..........GND                                      */
+/* DIN........11...........51                                       */
+/* CS (LOAD)..10...........10                                       */
+/* CLK........13...........52                                       */
+/********************************************************************/
+#ifdef MAX7219
+#include "SPI.h"
+#define CS_PIN 10
+#endif
+
+/********************************************************************/
+/* Configure keypad layout and GPIO                                 */
+/********************************************************************/
+
+const byte ROWS = 5;
+const byte COLS = 4;
+char keymap[ROWS][COLS] = {
+  { 'g', 'm', 'z', 'a' },
+  { '7', '8', '9', 'b' },
+  { '4', '5', '6', 'c' },
+  { '1', '2', '3', 'd' },
+  { 't', '0', 'f', 'e' }
+};
+
+#ifdef LCD1602
+byte rowPins[ROWS] = { 10, A0, A1, A2, A3 };  // connect to the row pinouts of the keypad
+byte colPins[COLS] = { 6, 7, 8, 9 };          // connect to the column pinouts of the keypad
+#endif
+
+#ifdef MAX7219
+byte rowPins[ROWS] = { 2, 3, 4, 5, 6 };   // connect to the row pinouts of the keypad
+byte colPins[COLS] = { A0, A1, A2, A3 };  // connect to the column pinouts of the keypad
+#endif
+
+Keypad keypad = Keypad(makeKeymap(keymap), rowPins, colPins, ROWS, COLS);
+
+/********************************************************************/
+/* End of display and keypad config                                 */
+/********************************************************************/
+
+/********************************************************************/
+/* Emulator variables                                               */
+/********************************************************************/
 
 int Acc, Ext, Stat; /* SC/MP CPU Registers */
 int Ptr[4];
@@ -43,8 +113,16 @@ static int AutoIndexed(int);
 static int BinAdd(int, int);
 static int DecAdd(int, int);
 
+/********************************************************************/
+/* Intel Hex loader variables                                       */
+/********************************************************************/
+
 int hexLoaderState, hexCounter, hexBytes, hexAddrHi, hexAddr, hexSum, hexTmp = 0; /* Variables for hex loader */
 
+/********************************************************************/
+/* Display variables                                                */
+/********************************************************************/
+#ifdef LCD1602
 const uint8_t segments[7][8] = { /* bitmaps of 7segments */
                                  { 0x1f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
                                  { 0x01, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00 },
@@ -54,33 +132,10 @@ const uint8_t segments[7][8] = { /* bitmaps of 7segments */
                                  { 0x10, 0x10, 0x10, 0x10, 0x00, 0x00, 0x00 },
                                  { 0x00, 0x00, 0x00, 0x1f, 0x00, 0x00, 0x00 }
 };
-
-/********************************************************************/
-/* Configure LCD and GPIO                                           */
-/********************************************************************/
-
-const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
-LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+#endif
 int activeDigit = 0;                                  // Track the last active character
 int digitPersistance[] = { 0, 0, 0, 0, 0, 0, 0, 0 };  // character persistance timer, will count down from "persistanceTimeout" and will reset when addressed
 const int persistanceTimeout = 300;                   // Number of cycles a character will be persistant without refresh
-
-/********************************************************************/
-/* Configure keypad layout and GPIO                                 */
-/********************************************************************/
-
-const byte ROWS = 5;
-const byte COLS = 4;
-char hexaKeys[ROWS][COLS] = {
-  { 'g', 'm', 'z', 'a' },
-  { '7', '8', '9', 'b' },
-  { '4', '5', '6', 'c' },
-  { '1', '2', '3', 'd' },
-  { 't', '0', 'f', 'e' }
-};
-byte rowPins[ROWS] = { 10, A0, A1, A2, A3 };  // connect to the row pinouts of the keypad
-byte colPins[COLS] = { 6, 7, 8, 9 };          // connect to the column pinouts of the keypad
-Keypad keypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
 /********************************************************************/
 /*              Setup hardware and initialze CPU                    */
@@ -106,6 +161,8 @@ void loop() {
       hexCounter = 0;
     } else if (hexLoaderState == 1) {
       hexLoader(b);
+    } else {
+      Key = b;
     }
   } else {
     char keypress = keypad.getKey();
@@ -119,13 +176,25 @@ void loop() {
 /********************************************************************/
 /* Initialize Display                                               */
 /********************************************************************/
+
 void initializeDisplay() {
+#ifdef LCD1602
   lcd.begin(16, 2);
   lcd.clear();
   const unsigned char nochar[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
   for (int i = 0; i < 8; i++) {
     lcd.createChar(i, nochar);
   }
+#endif
+#ifdef MAX7219
+  SPI.begin();
+  SPI.setBitOrder(MSBFIRST);
+  MAX7219Write(0x0C, 1);  // Shutdown mode - Normal Operation
+  MAX7219Write(0x0A, 1);  // Intensity Low
+  MAX7219Write(0x09, 0);  // Decode Mode - No decode mode
+  MAX7219Write(0x0F, 0);
+  MAX7219Write(0x0B, 7);
+#endif
 }
 
 /********************************************************************/
@@ -133,6 +202,7 @@ void initializeDisplay() {
 /********************************************************************/
 
 void updateDisplay() {
+#ifdef LCD1602
   lcd.setCursor(4, 0);
   for (int i = 0; i < 8; i++) {
     if (DisplayBuffer[i] == 0) {
@@ -141,8 +211,21 @@ void updateDisplay() {
       lcd.write(i);
     }
   }
+#endif
+#ifdef MAX7219
+  unsigned char reversed;
+  for (int i = 0; i < 8; i++) {
+    unsigned char c = DisplayBuffer[i];
+    reversed = 0;
+    for (int n = 0; n < 8; n++) {
+      reversed <<= 1;
+      reversed |= (c & 1);
+      c >>= 1;
+    }
+    MAX7219Write(8 - i, reversed >> 1);
+  }
+#endif
 }
-
 
 /********************************************************************/
 /* Update Digit Persistance                                         */
@@ -169,6 +252,7 @@ void printDigit(char c, int pos) {
   if (DisplayBuffer[pos] == c)
     return;
 
+#ifdef LCD1602
   uint8_t segment[8], i, n, cc;
   for (int i = 0; i < 8; i++) {
     byte cc = 0;
@@ -179,10 +263,10 @@ void printDigit(char c, int pos) {
     segment[i] = cc;
   }
   lcd.createChar(pos, segment);
+#endif
   DisplayBuffer[pos] = c;
   updateDisplay();
 }
-
 
 /********************************************************************/
 /* Reset the CPU                                                    */
@@ -752,3 +836,17 @@ void hexLoader(int b) {
 void fetch(int *ptr) {
   *ptr = ReadMemory((++Ptr[0]) & 0xFFF);
 }
+
+/********************************************************************/
+/* Write to the MAX7219 over SPI                                     */
+/********************************************************************/
+
+#ifdef MAX7219
+void MAX7219Write(byte Address, byte Data) {
+  digitalWrite(CS_PIN, LOW);
+  SPI.transfer(Address);
+  SPI.transfer(Data);
+  digitalWrite(CS_PIN, HIGH);
+  digitalWrite(CS_PIN, LOW);
+}
+#endif
