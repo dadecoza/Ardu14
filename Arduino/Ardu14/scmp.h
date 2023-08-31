@@ -6,31 +6,6 @@
 /*																                                 	*/
 /********************************************************************/
 
-#define DIGITS (9) /* LED Digit Count */
-
-/********************************************************************/
-/*		The External Interface - Porting for various versions		*/
-/********************************************************************/
-
-#define KEY_DIGIT (n)   /* 0-9,A-F are 0x00-0x0F */
-#define KEY_TERM (0x10) /* Key codes for the other keys */
-#define KEY_ABORT (0x11)
-#define KEY_GO (0x12)
-#define KEY_MEM (0x13)
-#define KEY_BREAK (0x14)
-#define KEY_RESET (0x15)
-
-void CONInitialise(void);  /* Initialise the console */
-void CONTerminate(void);   /* Close down the console */
-void CONWrite(char);       /* Write a character */
-char CONRead(void);        /* Read a character */
-int CONKeyPressed(int);    /* Is a key pressed ? */
-void CONDrawLED(int, int); /* Draw LED (0-7) of given pattern */
-void CONSynchronise(long); /* CPU Speed Synchronise */
-
-/* Supported characters are standard 7 bit ASCII, 13 (CR) & 8 (BS) 	*/
-/* CR on CONWrite does CR/LF */
-
 /********************************************************************/
 /*						Emulator Global Includes				                    	*/
 /********************************************************************/
@@ -39,9 +14,6 @@ extern int Acc, Ext, Stat;        /* SC/MP 8 bit Registers */
 extern int Ptr[4];                /* SC/MP 16 bit Registers */
 extern unsigned char Memory[256]; /* SC/MP Main Memory */
 extern long Cycles;               /* CPU Cycle Counter */
-
-extern int debugCounter; /* CPU Cycle Counter */
-
 
 void MinimalistEmulator(char *); /* All that's needed to emulate.. */
 int LoadObject(char *);          /* Load file into memory */

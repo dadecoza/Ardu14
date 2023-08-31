@@ -190,7 +190,7 @@ void initializeDisplay() {
   SPI.begin();
   SPI.setBitOrder(MSBFIRST);
   MAX7219Write(0x0C, 1);  // Shutdown mode - Normal Operation
-  MAX7219Write(0x0A, 1);  // Intensity Low
+  MAX7219Write(0x0A, 0);  // Intensity Low
   MAX7219Write(0x09, 0);  // Decode Mode - No decode mode
   MAX7219Write(0x0F, 0);
   MAX7219Write(0x0B, 7);
