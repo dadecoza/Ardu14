@@ -5,10 +5,17 @@ This project is based on the "Portable MK14 emulator in 'C'". While I'm not cert
 
 ### Dependencies
 * [Keypad Library](https://www.arduino.cc/reference/en/libraries/keypad/)
-* [LiquidCrystal Library](https://www.arduino.cc/reference/en/libraries/liquidcrystal/)
+* [SPI](https://www.arduino.cc/reference/en/language/functions/communication/spi/)
+
+### Components
+ * 1x Arduino Nano
+ * 1x MAX7219 7-Segment display module
+ * 21x 6x6mm Tactile switches
 
 ### Schematics
-None! Well, kind of. Just follow the guides for the above-mentioned libraries and configure the GPIO pins accordingly in the Ardu14 sketch.
+You can find the schematics [here](https://github.com/dadecoza/Ardu14/blob/main/Images/Schematic.png).
+
+***NOTE:*** The schematics includes an optional speaker and resistor ... In future I would like to implement emulation of the Ferranti ZN425E DAC to produce sound.
 
 ### Programs
 I have included the example programs from the "Mk14 Micro Computer Training Manual". For descriptions and start addresses, I'll direct you to [Doug's webpage](http://www.dougrice.plus.com/dev/seg_mk14.htm).
