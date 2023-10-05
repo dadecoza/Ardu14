@@ -102,9 +102,7 @@ int Ptr[4];
 unsigned char Memory[256], OptionMemory[256]; /* SC/MP Program Memory */
 unsigned char DisplayBuffer[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 unsigned char Key;
-long Cycles;                 /* Cycle Count */
-long executeTimer = 0;       /* Track time to execute */
-const int executeSpeed = 10; /* Amount of microseconds before next instruction */
+long Cycles; /* Cycle Count */
 
 static int Indexed(int); /* Local prototypes */
 /* bug in Paul Robson's emulator JMPS with offset 80 do not use E .*/
@@ -172,7 +170,7 @@ void loop() {
       } else {
         Key = keypress;
       }
-    executeTimedInstruction();
+    Execute(1);
     updateDigitPersistance();
   }
 }
@@ -587,18 +585,6 @@ void Execute(int Count) {
       case 0x08: /* NOP */
         break;
     }
-  }
-}
-
-/********************************************************************/
-/* Execute timed instruction                                        */
-/********************************************************************/
-
-void executeTimedInstruction() {
-  unsigned long m = micros();
-  if (executeTimer < m) {
-    executeTimer = m + executeSpeed;
-    Execute(1);
   }
 }
 
