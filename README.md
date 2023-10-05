@@ -1,5 +1,5 @@
 ## Ardu14: An Arduino-Based Emulator for the Science of Cambridge MK14 Micro Computer
-<img src="https://raw.githubusercontent.com/dadecoza/Ardu14/main/Images/Ardu14.jpg" alt="Ardu14" width="480" height="auto">
+<img src="https://raw.githubusercontent.com/dadecoza/Ardu14/main/Images/Ardu14PCB.jpg" alt="Ardu14" width="480" height="auto">
 
 This project is based on the "Portable MK14 emulator in 'C'". While I'm not certain of the exact origins, I discovered it in Doug Rice's [Virtual MK14](https://github.com/doug-h-rice/virtual_mk14) GitHub repository. [Doug](http://www.dougrice.plus.com/) and [Hein Pragt's](https://www.heinpragt.com/english/software_development/ins8060_or_scmp_processor.html) websites were valuable resources while working on this project.
 
