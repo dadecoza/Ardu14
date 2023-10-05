@@ -99,7 +99,7 @@ Keypad keypad = Keypad(makeKeymap(keymap), rowPins, colPins, ROWS, COLS);
 
 int Acc, Ext, Stat; /* SC/MP CPU Registers */
 int Ptr[4];
-unsigned char Memory[256], OptionMemory[256]; /* SC/MP Program Memory */
+unsigned char Memory[256], OptionMemory[256], ExpandedMemory[1024]; /* SC/MP Program Memory */
 unsigned char DisplayBuffer[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 unsigned char Key;
 long Cycles; /* Cycle Count */
@@ -143,8 +143,8 @@ void setup() {
   initializeDisplay();
   Serial.begin(9600);
   ResetCPU();
-  Serial.println("Ardu14 - Science of Cambridge MK14 emulator\n");
-  Serial.println("Ready.");
+  Serial.println(F("Ardu14 - Science of Cambridge MK14 emulator\n"));
+  Serial.println(F("Ready."));
 }
 
 /********************************************************************/
@@ -683,10 +683,12 @@ static int AutoIndexed(int p) {
 int ReadMemory(int Address) {
   int n = Address & 0x0F00;
   int c;
-  if (n < 0x800) {
-    c = pgm_read_byte_near(scios + (Address % 0x200));
+  if (n < 0x200) {
+    c = pgm_read_byte_near(scios + Address);
     c = c & 0xFF;
     return c;
+  } else if (n < 0x600) {
+    return (ExpandedMemory[Address - 0x200]);
   } else if (n == 0xB00) {
     return (OptionMemory[Address & 0xFF]);
   } else if (n == 0x900 || n == 0xD00) { /* Handle I/O at 900 or D00 */
@@ -704,8 +706,10 @@ int ReadMemory(int Address) {
 /********************************************************************/
 
 void WriteMemory(int Address, int Data) {
-  int n = Address & 0x0F00;     /* Find out which page */
-  if (n == 0x900 || n == 0xD00) /* Writing to I/O */
+  int n = Address & 0x0F00; /* Find out which page */
+  if (n >= 0x200 && n < 0x600) {
+    ExpandedMemory[Address - 0x200] = Data;
+  } else if (n == 0x900 || n == 0xD00) /* Writing to I/O */
   {
     n = Address & 0xF;
     if (n < 8)
@@ -787,13 +791,13 @@ void hexLoader(int b) {
       if (index == 0) {
         hexSum = 0;
         hexBytes = data;
-        Serial.print("Loading ");
+        Serial.print(F("Loading "));
         Serial.print(data);
       } else if (index == 1) {
         hexAddrHi = data;
       } else if (index == 2) {
         hexAddr = ((hexAddrHi * 16 * 16) + data);
-        Serial.print(" bytes at address ");
+        Serial.print(F(" bytes at address "));
         Serial.print(hexAddr, HEX);
         Serial.println(" ...");
       } else if (index == 3) {
@@ -814,7 +818,7 @@ void hexLoader(int b) {
     }
     hexCounter++;
   } else {
-    Serial.println("Unexpected character ... aborting");
+    Serial.println(F("Unexpected character ... aborting"));
     hexLoaderState = 0;
   }
 }
