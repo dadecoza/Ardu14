@@ -17,18 +17,6 @@ You can find the schematics [here](https://github.com/dadecoza/Ardu14/blob/main/
 
 ***NOTE:*** The schematics includes an optional speaker and resistor ... In future I would like to implement emulation of the Ferranti ZN425E DAC to produce sound.
 
-### Memory Map
-| Address | Usage          |
-| ---     | ---            |
-| 000-1FF | SCIOS          |
-| 200-5FF | Expanded RAM   |
-| 600-8FF | N/A            |
-| 900-9FF | Display/Keypad |
-| A00-AFF | N/A            |
-| B00-BFF | Option RAM     |
-| D00-DFF | Display/Keypad |
-| F00-FFF | RAM            |
-
 ### Programs
 I have included the example programs from the "Mk14 Micro Computer Training Manual". For descriptions and start addresses, I'll direct you to [Doug's webpage](http://www.dougrice.plus.com/dev/seg_mk14.htm).
 
