@@ -143,6 +143,11 @@ void setup() {
   initializeDisplay();
   Serial.begin(9600);
   ResetCPU();
+  // Load the SC message program into memory
+  for (int i = 0; i < 90; i++) {
+    unsigned char c = pgm_read_byte_near(scmessage + i);
+    WriteMemory(0xf20 + i, c);
+  }
   Serial.println(F("Ardu14 - Science of Cambridge MK14 emulator\n"));
   Serial.println(F("Ready."));
 }
