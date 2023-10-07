@@ -18,7 +18,9 @@ You can find the schematics [here](https://github.com/dadecoza/Ardu14/blob/main/
 ***NOTE:*** The schematics includes an optional speaker and resistor ... In future I would like to implement emulation of the Ferranti ZN425E DAC to produce sound.
 
 ### Programs
-I have included the example programs from the "Mk14 Micro Computer Training Manual". For descriptions and start addresses, I'll direct you to [Doug's webpage](http://www.dougrice.plus.com/dev/seg_mk14.htm).
+I have included the [example programs](https://github.com/dadecoza/Ardu14/tree/main/Programs) from the "[Mk14 Micro Computer Training Manual](https://www.heinpragt.com/download1/MK14%20Manual%20(later%20version).pdf)". For descriptions and start addresses, I'll direct you to [Doug's webpage](http://www.dougrice.plus.com/dev/seg_mk14.htm).
+
+The [Message](https://github.com/dadecoza/Ardu14/blob/main/Programs/message.hex) program is loaded into memory on power on. You can run it be entering address ***0F20*** and pressing the ***Go*** button.
 
 ### Loading Programs
 Ardu14 can accept Intel Hex files uploaded over the serial port at 9600 baud.
