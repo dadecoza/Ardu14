@@ -80,6 +80,10 @@ if __name__ == "__main__":
     args = sys.argv
     if len(args) > 1:
         message = args[1]
-        print(create_program(message))
+        hexstr = create_program(message)
+        print(hexstr)
+        fh = open("out.hex", "w")
+        fh.write(hexstr)
+        fh.close()
     else:
         print("Usage: %s message" % args[0])
