@@ -13,7 +13,7 @@ import sys
 
 def get_record(record):
     if not record or not record.startswith(":"):
-        return []
+        return None
     record = record.strip().replace(":", "")
     data = [int(record[i:i+2], 16) for i in range(0, len(record), 2)]
     number_of_bytes = data[0]
@@ -32,7 +32,9 @@ def get_records(filename):
     try:
         with open(filename, "r") as f:
             for line in f.readlines():
-                records.append(get_record(line))
+                record = get_record(line)
+                if record:
+                    records.append(record)
     except FileNotFoundError as e:
         print("%s not found" % filename)
         sys.exit(1)
